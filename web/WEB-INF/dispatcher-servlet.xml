@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+       http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.5.xsd
+http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd">
+    
+    <bean class="org.springframework.web.servlet.mvc.support.ControllerClassNameHandlerMapping"/>
+    
+    <!--
+    Most controllers will use the ControllerClassNameHandlerMapping above, but
+    for the index controller we are using ParameterizableViewController, so we must
+    define an explicit mapping for it.
+    -->
+    <bean id="urlMapping" class="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping">
+        <property name="mappings">
+            <props>
+                <prop key="index.htm">indexController</prop>
+                <prop key="auth.do">authController</prop>
+                <prop key="reportContact.do">/reportContact.task</prop>
+                <prop key="reportAddress.do">/reportAddress.task</prop>
+                <prop key="addAddress.form">/addAddress.form</prop>
+                <prop key="addContact.form">/addContact.form</prop>
+                <prop key="deleteContact.form">/deleteContact.form</prop>
+                <prop key="deleteAddress.form">/deleteAddress.form</prop>
+                <prop key="modifyContact.form">/modifyContact.form</prop>
+                <prop key="modifyAddress.form">/modifyAddress.form</prop>
+            </props>
+        </property>
+    </bean>
+    
+    <bean id="viewResolver"
+          class="org.springframework.web.servlet.view.InternalResourceViewResolver"
+          p:prefix="/WEB-INF/jsp/"
+          p:suffix=".jsp" />
+    
+    <!--
+    The index controller.
+    -->
+    <bean name="indexController"
+          class="org.springframework.web.servlet.mvc.ParameterizableViewController"
+          p:viewName="index" />
+
+    <bean name="authController"
+          class="fr.esiea.ebooks.control.security.AuthController"/>
+
+    <bean name="/addContact.form" class="fr.esiea.ebooks.report.contact.AddContactController">
+        <property name="commandClass" value="fr.esiea.ebooks.model.Contact"/>
+        <property name="formView" value="addContact"/>
+        <property name="successView" value="addContactSuccess"/>
+        <property name="validator">
+            <bean class="fr.esiea.ebooks.report.contact.AddContactValidator" />
+        </property>
+    </bean>
+
+    <bean name="/addAddress.form" class="fr.esiea.ebooks.report.address.AddAddressController">
+        <property name="commandClass" value="fr.esiea.ebooks.model.Address"/>
+        <property name="formView" value="addAddress"/>
+        <property name="successView" value="addAddressSuccess"/>
+        <property name="validator">
+            <bean class="fr.esiea.ebooks.report.address.AddAddressValidator"/>
+        </property>
+    </bean>
+
+<bean name="/deleteContact.form" class="fr.esiea.ebooks.report.contact.DeleteContactController">
+        <property name="commandClass" value="fr.esiea.ebooks.model.Contact"/>
+        <property name="formView" value="deleteContact"/>
+        <property name="successView" value="deleteContactSuccess"/>
+        <property name="validator">
+            <bean class="fr.esiea.ebooks.report.contact.DeleteContactValidator" />
+        </property>
+    </bean>
+
+    <bean name="/deleteAddress.form" class="fr.esiea.ebooks.report.address.DeleteAddressController">
+        <property name="commandClass" value="fr.esiea.ebooks.model.Address"/>
+        <property name="formView" value="deleteAddress"/>
+        <property name="successView" value="deleteAddressSuccess"/>
+        <property name="validator">
+            <bean class="fr.esiea.ebooks.report.address.DeleteAddressValidator" />
+        </property>
+    </bean>
+
+ <bean name="/modifyContact.form" class="fr.esiea.ebooks.report.contact.ModifyContactController">
+        <property name="commandClass" value="fr.esiea.ebooks.model.Contact"/>
+        <property name="formView" value="modifyContact"/>
+        <property name="successView" value="modifyContactSuccess"/>
+        <property name="validator">
+            <bean class="fr.esiea.ebooks.report.contact.ModifyContactValidator" />
+        </property>
+    </bean>
+
+    <bean name="/modifyAddress.form" class="fr.esiea.ebooks.report.address.ModifyAddressController">
+        <property name="commandClass" value="fr.esiea.ebooks.model.Address"/>
+        <property name="formView" value="modifyAddress"/>
+        <property name="successView" value="modifyAddressSuccess"/>
+        <property name="validator">
+            <bean class="fr.esiea.ebooks.report.address.ModifyAddressValidator" />
+        </property>
+    </bean>
+
+
+      <bean name="/reportContact.task" class="fr.esiea.ebooks.report.contact.ReportContactController"/>
+      <bean name="/reportAddress.task" class="fr.esiea.ebooks.report.address.ReportAddressController"/>
+    
+    
+</beans>
