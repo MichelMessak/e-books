@@ -6,7 +6,7 @@ import org.springframework.validation.ValidationUtils;
 import org.springframework.validation.Validator;
 
 /**
- * Validator of addinf an enterprise
+ * Validator of adding a contact
  * @author Dispa Cécile
  */
 
@@ -15,7 +15,6 @@ public class AddContactValidator implements Validator
 
     public void validate(Object target, Errors errors)
     {
-        Contact contact = (Contact)target;
 
         ValidationUtils.rejectIfEmpty(errors, "firstName",
                 "required.firstName", "Le prénom est requis.");

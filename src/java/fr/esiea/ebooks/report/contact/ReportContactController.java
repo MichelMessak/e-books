@@ -8,6 +8,10 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.Controller;
 
+/*
+ * Controller to visualize all the contact
+ */
+
 public class ReportContactController implements Controller {
 
     public ModelAndView handleRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
@@ -37,6 +41,7 @@ public class ReportContactController implements Controller {
         Boolean[] sort = {true, true, true, true,true,  false,  false,  false};
         Boolean[] search = {true, true, true,true, true, false, false, false};
 
+        //Extra column for the modify, delete, visualize address options
         String[] colExtras = new String[]{
             "<form action=\"deleteContact.form\" method=\"post\" name=\"{0}\">" +
                     "<input type=\"image\" id=\"{0}Delete\" src=\"images/deleteIcon.png\" style=\"width: 20px; display:none;\" title=\"Supprimer un utilisateur\"/>" +
@@ -62,7 +67,7 @@ public class ReportContactController implements Controller {
            "</form>"+
                     "<input type=\"image\" src=\"images/editIcon.png\" onclick=\"sendRequest('reportContact.do', 'modifyContact.form' ,'{0}','modify')\" style=\"width: 20px;\" title=\"Modifier un Contact\"/>",
         
-            "<form action=\"reportAddress.do?isFilterSubmit=Consult\" method=\"post\">" +
+            "<form action=\"reportAddress.do?isTaskSubmit=Consult\" method=\"post\">" +
                     "<input type=\"hidden\" name=\"ID\" value=\"{5}\"/>" +
                     "<input type=\"image\" src=\"images/files_open_E.png\" style=\"width: 20px; height: 20px;\" title=\"Document\"/>" +
             "</form>"
@@ -74,9 +79,12 @@ public class ReportContactController implements Controller {
 
             request.getAttributeNames();
 
-            if (Report.isFilterCall(request)) {
 
-                report = new Report(fields, request.getRequestURL().toString());
+            //If is the first calling for this task
+            if (Report.isTaskCall(request)) {
+
+                    //Create the report 
+                report = new Report(fields,request.getRequestURL().toString());
                 report.setColumnAlignments(aligns);
                 report.setColumnWidths(widths);
                 report.setColumnExtras(colExtras);
@@ -86,16 +94,19 @@ public class ReportContactController implements Controller {
 
                  request.getSession().setAttribute("report", report);
 
-                report.ExecuteQuery(request);
+                report.ExecuteContactForTotals(request);
 
-                ModelAndView mv = new ModelAndView("enterprise");
+                ModelAndView mv = new ModelAndView("contact");
                 mv.addObject("data", report);
 
                 mv.addObject("title", "Carnet d'adresse");
 
+
+                //Return the report into the specific JPS
                 return mv;
             }
 
+            //If is the ajax call for refreshing the view
             else if (Report.isAjaxCall(request))
             {
                 try
@@ -105,7 +116,7 @@ public class ReportContactController implements Controller {
                         throw new DataMissingException("Les données n'ont pas pu être récupéré");
                     }
 
-                    report.configureDatatableParametersDocuments(request);
+                    report.configureDatatableParametersContact(request);
                     ModelAndView mv = new ModelAndView("pager");
                     mv.addObject("data", report);
                     return mv;
@@ -118,7 +129,7 @@ public class ReportContactController implements Controller {
 
             }
             else {
-                throw new ControllerActionUnknown("Appel à la consultation des documents inconnu");
+                throw new ControllerActionUnknown("Appel à la consultation des contacts inconnu");
             }
         } catch (Exception ex) {
             ModelAndView mv = new ModelAndView("error");

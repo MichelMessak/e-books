@@ -14,25 +14,21 @@
     @import "css/Form/form.css";
 	</style>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>Modification d'un utilisateur</title>
+        <title>Modification d'une addresse</title>
     </head>
     <body>
          <div id="header"></div>
          <div id="Logo"></div>
-         <div id="user">
-             ${sessionScope.user_name}
-         </div>
+        
          <a href="home.do">
              <div id="Home"></div>
          </a>
-         <a href="settings.do">
-             <div id="Engrane"></div>
-         </a>
+         
          <a href="logout.do" accesskey="l">
              <div id="LogOut"></div>
          </a>
          <div class="taskTitle">Modification d'une addresse</div><br>
-         <meta HTTP-EQUIV="REFRESH" content=".5; url=reportContact.do?isFilterSubmit=Consult">
+         <meta HTTP-EQUIV="REFRESH" content=".5; url=reportContact.do?isTaskSubmit=Consult">
 <link rel="stylesheet" href="css/Form/jpreloader.css" />
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
 <script type="text/javascript" src="js/Loader/jpreLoader.js"></script>

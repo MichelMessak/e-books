@@ -3,7 +3,6 @@ package fr.esiea.ebooks.report.contact;
 import fr.esiea.ebooks.model.Contact;
 import fr.esiea.ebooks.model.ContactsList;
 import java.util.Date;
-import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.springframework.validation.BindException;
@@ -11,7 +10,7 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.SimpleFormController;
 
 /**
- * Controller dor deleting an enterprise
+ * Controller dor deleting a contact
  * @author Michel Messak
  */
 public class DeleteContactController extends SimpleFormController {
@@ -33,7 +32,7 @@ public class DeleteContactController extends SimpleFormController {
     @Override
     protected ModelAndView onSubmit(HttpServletRequest request, HttpServletResponse response, Object command, BindException errors) throws Exception {
        
-
+//Delete the specific contact
             Contact contact = (Contact)command;
                     contactList.deleteContact(contactList.getContactPosition(contact));
                  
@@ -44,6 +43,8 @@ public class DeleteContactController extends SimpleFormController {
     @Override
     protected Object formBackingObject(HttpServletRequest request) throws Exception {
 
+
+        //Create the specific contact to show it
         Contact contact = new Contact();
         contact.setFirstName(request.getParameter("firstName"));
         contact.setLastName(request.getParameter("lastName"));

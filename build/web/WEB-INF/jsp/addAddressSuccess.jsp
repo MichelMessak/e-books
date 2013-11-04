@@ -16,20 +16,16 @@
     <body>
         <div id="header"></div>
         <div id="Logo"></div>
-        <div id="user">
-            ${sessionScope.user_name}
-        </div>
+        
         <a href="home.do">
             <div id="Home"></div>
         </a>
-        <a href="settings.do">
-            <div id="Engrane"></div>
-        </a>
+        
         <a href="logout.do" accesskey="l">
             <div id="LogOut"></div>
         </a>
          <div class="taskTitle">Ajout d'une Addresse</div>
-         <meta HTTP-EQUIV="REFRESH" content="2; url=reportContact.do?isFilterSubmit=Consult">
+         <meta HTTP-EQUIV="REFRESH" content="2; url=reportContact.do?isTaskSubmit=Consult">
 <link rel="stylesheet" href="css/Form/jpreloader.css" />
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
 <script type="text/javascript" src="js/Loader/jpreLoader.js"></script>

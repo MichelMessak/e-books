@@ -10,7 +10,7 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.SimpleFormController;
 
 /**
- * Controller for adding an enterprise
+ * Controller for adding a contact
  * @author Dispa Cécile
  */
 public class AddContactController extends SimpleFormController {
@@ -34,6 +34,7 @@ public class AddContactController extends SimpleFormController {
     protected ModelAndView onSubmit(HttpServletRequest request, HttpServletResponse response, Object command, BindException errors) throws Exception {
         try {
 
+            //Create a new contact and put it into le contact list
         Contact contact = (Contact) command;
         String birth = request.getParameter("birthday");
         String[] result = birth.split("/");

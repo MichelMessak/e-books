@@ -1,8 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package fr.esiea.ebooks.model;
 
 import java.util.ArrayList;
@@ -78,6 +73,8 @@ public Contact getContact (int position){
 		 contactsList.remove(position);
 	}
 
+
+        //This method permit us to know the contact position (it is a king of equal for the contact objet)
         public int getContactPosition (Contact contact){
             for (int i = 0;i<this.size();i++){
                 if (this.getContact(i).getFirstName().equals(contact.getFirstName()))

@@ -3,16 +3,13 @@ package fr.esiea.ebooks.report.address;
 import fr.esiea.ebooks.data.Report;
 import fr.esiea.ebooks.util.error.ControllerActionUnknown;
 import fr.esiea.ebooks.util.error.DataMissingException;
-import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.Controller;
 
 /**
- * Controlador para visualizar los archivos de un documento
- * @author Ángel García Alcántara
- * @since 1.0.0.0
+ * Controller to visualize all the address from a specific contact
  */
 public class ReportAddressController implements Controller {
 
@@ -40,7 +37,7 @@ public class ReportAddressController implements Controller {
         Boolean[] visible = {  true,true, true, true, true, true};
         Boolean[] sort = {true, true, true,true,  false,  false};
         Boolean[] search = {true, true ,true, true, false, false};
-
+//Extra column for the modify and delete option
         String[] colExtras = new String[]{
             "<form action=\"deleteAddress.form\" method=\"post\" name=\"{0}\">" +
                     "<input type=\"image\" id=\"{0}Delete\" src=\"images/deleteIcon.png\" style=\"width: 20px; display:none;\" title=\"Supprimer un utilisateur\"/>" +
@@ -74,10 +71,11 @@ public class ReportAddressController implements Controller {
 
             request.getAttributeNames();
 
-            if (Report.isFilterCall(request)) {
+            //If is the first calling for this task
+            if (Report.isTaskCall(request)) {
 
-                
-                report = new Report(fields, request.getRequestURL().toString());
+                //Create the report 
+                report = new Report(fields,request.getRequestURL().toString());
                 report.setColumnAlignments(aligns);
                 report.setColumnWidths(widths);
                 report.setColumnExtras(colExtras);
@@ -88,16 +86,18 @@ public class ReportAddressController implements Controller {
                 request.getSession().setAttribute("report", report);
 
                 request.getAttribute("ID");
-                report.ExecuteAddress(request,request.getParameter("ID"));
+                report.ExecuteAddressForTotals(request,request.getParameter("ID"));
 
-                ModelAndView mv = new ModelAndView("user");
+                ModelAndView mv = new ModelAndView("contact");
                 mv.addObject("data", report);
                 mv.addObject("ID", report.getID());
                 mv.addObject("title", "Carnet d'adresse");
 
+                //Return the report into the specific JPS
                 return mv;
             }
 
+            //If is the ajax call for refreshing the view
             else if (Report.isAjaxCall(request))
             {
                 try
@@ -106,7 +106,7 @@ public class ReportAddressController implements Controller {
                     if (report == null) {
                         throw new DataMissingException("Les données n'ont pas pu être récupéré");
                     }
-
+                    //Set the new view
                     report.configureDatatableParametersAddress(request);
                     ModelAndView mv = new ModelAndView("pager");
                     mv.addObject("data", report);
@@ -121,7 +121,7 @@ public class ReportAddressController implements Controller {
 
             }
             else {
-                throw new ControllerActionUnknown("Appel à la consultation des documents inconnu");
+                throw new ControllerActionUnknown("Appel à la consultation des addresses inconnu");
             }
         } catch (Exception ex) {
             ModelAndView mv = new ModelAndView("error");

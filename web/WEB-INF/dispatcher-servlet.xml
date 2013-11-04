@@ -20,6 +20,7 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
             <props>
                 <prop key="index.htm">indexController</prop>
                 <prop key="auth.do">authController</prop>
+                <prop key="logout.do">logoutController</prop>
                 <prop key="reportContact.do">/reportContact.task</prop>
                 <prop key="reportAddress.do">/reportAddress.task</prop>
                 <prop key="addAddress.form">/addAddress.form</prop>
@@ -46,6 +47,9 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
 
     <bean name="authController"
           class="fr.esiea.ebooks.control.security.AuthController"/>
+
+    <bean name="logoutController"
+          class="fr.esiea.ebooks.control.security.LogoutController"/>
 
     <bean name="/addContact.form" class="fr.esiea.ebooks.report.contact.AddContactController">
         <property name="commandClass" value="fr.esiea.ebooks.model.Contact"/>

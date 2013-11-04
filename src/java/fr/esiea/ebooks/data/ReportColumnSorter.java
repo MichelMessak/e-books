@@ -30,9 +30,11 @@ public class ReportColumnSorter
         this.sorts.put(colNumber, colDir);
     }
 
-    public String GenerateSortSql()
+
+    //Generate the sorting column
+    public String GenerateSort()
     {
-        String sql=null;
+        String sort=null;
         Iterator iter=this.sorts.entrySet().iterator();
         while(iter.hasNext())
         {
@@ -45,13 +47,12 @@ public class ReportColumnSorter
                 int iColNumber=Integer.parseInt(sColNumber);
                 if(iColNumber>=0 && iColNumber<this.colNames.length)
                 {
-                    if(sql==null) sql="";
-                    if(!sql.equals("")) sql+=", ";
-                    sql+=this.colNames[iColNumber]+" "+sColDir;
+                    if(sort==null) sort="";
+                    if(!sort.equals("")) sort+=", ";
+                    sort+=this.colNames[iColNumber];
                 }
             }
         }
-        if(sql!=null) sql=" order by "+sql;
-        return sql;
+        return sort;
     }
 }

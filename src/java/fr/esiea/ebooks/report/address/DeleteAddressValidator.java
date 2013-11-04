@@ -5,7 +5,7 @@ import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 
 /**
- * Validato for deleting an enterprise
+ * Validato for deleting an address
  * @author Michel Messak
  */
 

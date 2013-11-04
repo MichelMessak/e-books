@@ -1,9 +1,7 @@
 package fr.esiea.ebooks.report.address;
 
 import fr.esiea.ebooks.model.Address;
-import fr.esiea.ebooks.model.Contact;
 import fr.esiea.ebooks.model.ContactsList;
-import java.util.Date;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.springframework.validation.BindException;
@@ -11,7 +9,7 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.SimpleFormController;
 
 /**
- * Controller fr modify an User
+ * Controller to modify an Address
  * @author Micchel Messak
  */
 public class ModifyAddressController extends SimpleFormController {
@@ -36,6 +34,8 @@ public class ModifyAddressController extends SimpleFormController {
         
         Address address = (Address)command;
 
+
+        //Modify the data f the specific address
         for (int i=0;i<contactList.size();i++)
              if(contactList.getContact(i).getID().equals(address.getIDContact()))
                  for (int j = 0; j<contactList.getContact(i).getAllAdress().size();j++)
@@ -53,7 +53,9 @@ public class ModifyAddressController extends SimpleFormController {
     @Override
     protected Object formBackingObject(HttpServletRequest request) throws Exception {
 
-         Address address = new Address();
+        //Create the address
+
+        Address address = new Address();
         address.setNumber(request.getParameter("number"));
         address.setStreet(request.getParameter("street"));
         address.setPostalCode(request.getParameter("postalCode"));

@@ -8978,7 +8978,7 @@
 		 *      } );
 		 *    } )
 		 */
-		"iDisplayLength": 20,
+		"iDisplayLength": 15,
 	
 	
 		/**

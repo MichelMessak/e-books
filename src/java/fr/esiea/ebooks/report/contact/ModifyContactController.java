@@ -3,7 +3,6 @@ package fr.esiea.ebooks.report.contact;
 import fr.esiea.ebooks.model.Contact;
 import fr.esiea.ebooks.model.ContactsList;
 import java.util.Date;
-import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.springframework.validation.BindException;
@@ -11,7 +10,7 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.SimpleFormController;
 
 /**
- * Controller fr modify an User
+ * Controller fr modify a Contact
  * @author Micchel Messak
  */
 public class ModifyContactController extends SimpleFormController {
@@ -33,7 +32,8 @@ public class ModifyContactController extends SimpleFormController {
 
     @Override
     protected ModelAndView onSubmit(HttpServletRequest request, HttpServletResponse response, Object command, BindException errors) throws Exception {
-        
+
+        //Modify the specific contact
         Contact contact = (Contact)command;
 
         for (int i=0;i<contactList.size();i++)
@@ -55,6 +55,8 @@ public class ModifyContactController extends SimpleFormController {
     @Override
     protected Object formBackingObject(HttpServletRequest request) throws Exception {
 
+
+        //Recreate the contact to visualize it
         Contact contact = new Contact();
         contact.setFirstName(request.getParameter("firstName"));
         contact.setLastName(request.getParameter("lastName"));

@@ -2,7 +2,6 @@ package fr.esiea.ebooks.report.address;
 
 import fr.esiea.ebooks.data.Report;
 import fr.esiea.ebooks.model.Address;
-import fr.esiea.ebooks.model.Contact;
 import fr.esiea.ebooks.model.ContactsList;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -11,7 +10,7 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.SimpleFormController;
 
 /**
- * Controller for adding an enterprise
+ * Controller for adding an address
  * @author Dispa Cécile
  */
 public class AddAddressController extends SimpleFormController {
@@ -38,6 +37,7 @@ public class AddAddressController extends SimpleFormController {
 
         Address address = (Address) command;
 
+        //Add an address into a contact
                     Report report = (Report) request.getSession().getAttribute("report");
                     for (int i=0;i<contactList.size();i++)
                         if(contactList.getContact(i).getID().equals(report.getID()))
@@ -48,7 +48,7 @@ public class AddAddressController extends SimpleFormController {
              
             return mv;
         } catch (Exception ex) {
-            errors.rejectValue("firstName", "addUser", ex.getMessage());
+            errors.rejectValue("firstName", "addContact", ex.getMessage());
             return this.showForm(request, response, errors);
         }
     }

@@ -6,7 +6,7 @@ import org.springframework.validation.ValidationUtils;
 import org.springframework.validation.Validator;
 
 /**
- * Validator of addinf an enterprise
+ * Validator of adding an address
  * @author Dispa Cécile
  */
 

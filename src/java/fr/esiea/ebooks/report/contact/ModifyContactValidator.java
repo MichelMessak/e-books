@@ -5,7 +5,7 @@ import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 
 /**
- * Validador for modify an user
+ * Validador for modify a contact
  * @author Dispa Cécile
  */
 

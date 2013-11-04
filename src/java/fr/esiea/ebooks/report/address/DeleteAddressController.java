@@ -3,8 +3,6 @@ package fr.esiea.ebooks.report.address;
 import fr.esiea.ebooks.model.Address;
 import fr.esiea.ebooks.model.Contact;
 import fr.esiea.ebooks.model.ContactsList;
-import java.util.Date;
-import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.springframework.validation.BindException;
@@ -12,7 +10,7 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.SimpleFormController;
 
 /**
- * Controller dor deleting an enterprise
+ * Controller dor deleting an address
  * @author Michel Messak
  */
 public class DeleteAddressController extends SimpleFormController {
@@ -37,6 +35,8 @@ public class DeleteAddressController extends SimpleFormController {
 
             Address address = (Address)command;
 
+            //Find the correct address for deleting it into the specific contact
+
          for (int i=0;i<contactList.size();i++)
              if(contactList.getContact(i).getID().equals(address.getIDContact()))
                  for (int j = 0; j<contactList.getContact(i).getAllAdress().size();j++)
@@ -53,6 +53,8 @@ public class DeleteAddressController extends SimpleFormController {
 
     @Override
     protected Object formBackingObject(HttpServletRequest request) throws Exception {
+
+        //Create the object address
 
         Address address = new Address();
         address.setNumber(request.getParameter("number"));

@@ -31,11 +31,11 @@ public class ReportColumnFilter
        this.filters.put(sColNumber, sColValue);
     }
 
-    public String GenerateFilterSql()
+    //Generate filter of a column
+    public String [] GenerateFilter()
     {
-        try
-        {
-            String sql=null;
+  
+            String sort[ ] = new String[2];
             Iterator iter=this.filters.entrySet().iterator();
             while(iter.hasNext())
             {
@@ -47,39 +47,16 @@ public class ReportColumnFilter
                 {
                     int iColNumber=Integer.parseInt(sColNumber);
                     if(iColNumber>=0 && iColNumber<this.colNames.length)
-                    {
-                        if(sql==null) sql="";
-                        if(!sql.equals("")) sql+=" and ";
-                        sql+=this.colNames[iColNumber]+"::text like '"+sColValue+"%'";
+                    {   
+                        sort[0]=sColNumber;
+                        sort[1]=sColValue;
                     }
                 }
             }
 
-            String sqlSearch="";
-            if(search!=null && !"".equals(this.search))
-            {
-                for(int i=0;i<this.colNames.length;i++)
-                {
-                    if(!sqlSearch.equals("")) sqlSearch+=" or ";
-                    sqlSearch+=this.colNames[i]+"::text like '%"+this.search+"%'";
-                }
-                if(!"".equals(sqlSearch))
-                    sqlSearch="("+sqlSearch+")";
-            }
 
-            if(!"".equals(sqlSearch))
-            {
-                if(sql==null) sql=""; else sql+=" and ";
-                sql+=" "+sqlSearch;
-            }
-
-            return sql;
-        }
-        catch(Exception ex)
-        {
-            return null;
-        }
-    }
+            return sort;
+           }
 
     public void setSearch(String search)
     {

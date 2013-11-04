@@ -3,10 +3,6 @@ package fr.esiea.ebooks.data;
 import fr.esiea.ebooks.model.Contact;
 import fr.esiea.ebooks.model.ContactsList;
 import fr.esiea.ebooks.util.Util;
-import fr.esiea.ebooks.util.error.DBConnectionNotFound;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import javax.servlet.http.HttpServletRequest;
 import org.json.simple.JSONArray;
 
@@ -25,61 +21,35 @@ public class Report {
     private Boolean[] columnVisibles;
     private Boolean[] columnSortables;
     private Boolean[] columnSearchables;
-    private String ID;
-    private String query, queryTotal, queryB, URL;
-    private String task;
+    private String ID,URL;
     private JSONArray data;
     private int rowCount, rowFilterCount = 0;
     private int columnCount, currentPage, pageCount;
     private ReportColumnSorter sorter;
     private ReportColumnFilter filter;
-    private ReportWhere where;
-    private final int ROWS_PER_PAGE = 20;
+    private final int ROWS_PER_PAGE = 15;
     private int OFFSET = 0;
+    
     ContactsList contactList = ContactsList.getInstance();
 
     public Report(String[] columnNames, String URL) throws Exception {
         try {
             this.columnNames = columnNames;
-            this.URL = URL;
             this.rowCount = 0;
+            this.URL = URL;
             this.columnCount = columnNames.length;
             this.pageCount = 0;
-            String[] colNames = {"Prénom","Nom","Date de Naissance","Email","Actif"};
-            this.sorter = new ReportColumnSorter(colNames);
-            this.filter = new ReportColumnFilter(colNames);
-            this.where = new ReportWhere();
+            this.sorter = new ReportColumnSorter(columnNames);
+            this.filter = new ReportColumnFilter(columnNames);
         } catch (Exception ex) {
             throw ex;
         }
     }
 
-    /**
-     * Execute the query configurated. It is use to start the
-     * Ejecuta el query configurado. Se usa para empezar la carga del objeto
-     */
-    public void ExecuteQuery(HttpServletRequest request) throws Exception {
-        try {
-            ExecuteQueryForTotals(request);
-
-        } catch (Exception ex) {
-            throw ex;
-        }
+     public String getURL() {
+        return this.URL;
     }
 
-    public void ExecuteAddress(HttpServletRequest request,String ID) throws Exception {
-        try {
-            ExecuteAddressForTotals(request,ID);
-
-        } catch (Exception ex) {
-            throw ex;
-        }
-    }
-
-    /**
-     * Obtiene el número de columnas del reporte
-     * @return  Número de columnas en el reporte
-     */
     public int getColumnCount() {
         if (this.columnNames != null) {
             return this.columnNames.length;
@@ -88,65 +58,27 @@ public class Report {
         }
     }
 
-    /**
-     * Obtiene el número de la página actual
-     * @return  número de página
-     */
-    public int getCurrentPage() {
-        return this.currentPage;
-    }
-
-    /**
-     * Obtiene el número total de registros en el query
-     * @return  número total de registros
-     */
     public int getRowCount() {
         return this.rowCount;
     }
 
-    /**
-     * Obtiene el número total de registros filtrados en el último filtro consultado
-     * @return  número total de registros filtrados
-     */
     public int getRowFilterCount() {
         return this.rowFilterCount;
     }
 
-    /**
-     * Obtiene el número total de páginas de acuerdo al número de registros por página configurado
-     * @return  número total de páginas
-     */
     public int getPageCount() {
         return this.pageCount;
     }
 
-    /**
-     * Obtiene el arreglo de nombre de columnas del reporte
-     * @return
-     */
     public String[] getColumnNames() {
         return this.columnNames;
-        //return Arrays.asList(colNames).iterator();
     }
 
-    /**
-     * Obtiene el URL que responde al paginado asíncrono
-     * @return  La cadena conteniendo el URL que el objeto javascript debe llamar para procesamiento asíncrono de búsquedas,
-     * ordenamiento y filtrado
-     */
-    public String getURL() {
-        return this.URL;
-    }
-
-    /**
-     * Obtiene los registros desde la base de datos en formato JSON
-     * @return  Un arreglo JSON {@link JSONArray} de filas. Cada fila es otro arreglo JSON de valores de las columnas.
-     */
     public JSONArray getData() {
         return this.data;
     }
 
-    public Boolean ExecuteQueryForTotals(HttpServletRequest request) throws Exception {
+    public Boolean ExecuteContactForTotals(HttpServletRequest request) throws Exception {
 
                 this.rowCount = contactList.size();
 
@@ -165,7 +97,7 @@ public class Report {
 
     }
 
-     public Boolean ExecuteAddressForTotals(HttpServletRequest request,String ID) throws Exception {
+    public Boolean ExecuteAddressForTotals(HttpServletRequest request,String ID) throws Exception {
 
          this.ID = ID;
          for (int i=0;i<contactList.size();i++)
@@ -187,84 +119,117 @@ public class Report {
 
     }
 
-    /**
-     * Permite cargar los registros de la página anterior
-     * @param conn  La conexión a la base de datos si se tiene una. Si la conexión es nula, se pide una del pool.
-     * Ver {@link PoolConnection}
-     * @throws Exception
-     */
-    public void getPreviousPage(Connection conn) throws Exception {
-        try {
-            if (this.currentPage - 1 < 0) {
-                return;
-            }
-            this.currentPage--;
-            getCurrentPage(conn);
+    //Put all the contact value into a JSONArray
 
-        } catch (Exception e) {
-            throw e;
-        } finally {
+    public void copyValueContact(JSONArray row, int position) throws Exception{
 
-        }
+    String value = contactList.getContact(position).getFirstName();
+    row.add((value != null ? value.toString() : "&nbsp;"));
+
+    value = contactList.getContact(position).getLastName();
+    row.add((value != null ? value.toString() : "&nbsp;"));
+
+    value = contactList.getContact(position).getBirthday();
+    row.add((value != null ? value.toString() : "&nbsp;"));
+
+    value = contactList.getContact(position).getEmail();
+    row.add((value != null ? value.toString() : "&nbsp;"));
+
+    value = String.valueOf(contactList.getContact(position).isActif());
+    row.add((value != null ? value.toString() : "&nbsp;"));
+
+    for (int j = 0; this.columnExtras != null && j < this.columnExtras.length; j++) {
+        String html = Util.replaceValuesHTMLContact(this.columnExtras[j],position);
+            row.add(html);
     }
 
-    /**
-     * Permite obtener los registros de la base de datos de acuerdo a un inicio y un límite. Usado por el objeto
-     * javascript de paginación. Esta función carga los registros en un arreglo JSON de filas. Donde cada fila contiene
-     * un arreglo JSON de valores de columnas.
-     * @param offset    Número inicial del registro donde empezar
-     * @param limit     Número total de registros a cargar
-     * @throws Exception
-     */
+this.data.add(row);
+ }
 
-    public void getRecordsDocuments(HttpServletRequest request, int offset, int limit) throws Exception {
+    //Put all the Address value from a contact into a JSONArray
 
+    public void copyValueAddress(JSONArray row, int position, Contact contact) throws Exception{
 
+    Object value = contact.getAdress(position).getNumber();
+    row.add((value != null ? value.toString() : "&nbsp;"));
+
+    value = contact.getAdress(position).getStreet();
+    row.add((value != null ? value.toString() : "&nbsp;"));
+
+    value = contact.getAdress(position).getPostalCode();
+    row.add((value != null ? value.toString() : "&nbsp;"));
+
+    value = contact.getAdress(position).getCity();
+    row.add((value != null ? value.toString() : "&nbsp;"));
+
+    for (int j = 0; this.columnExtras != null && j < this.columnExtras.length; j++) {
+        String html = Util.replaceValuesHTMLAddress(this.columnExtras[j],contact,position);
+            row.add(html);
+    }
+
+    this.data.add(row);
+ }
+
+    // Set the data into a JSON Array
+    public void getRecordsContact(HttpServletRequest request, int offset, int limit) throws Exception {
+        
     this.rowCount = contactList.size();
 
     this.data = null;
     this.data = new JSONArray();
     this.rowFilterCount = 0;
 
-        for (int i = 0;i<contactList.size();i++) {
+        for (int i = offset;i<limit+offset && i<contactList.size() ;i++) {
             JSONArray row = new JSONArray();
             this.rowFilterCount++;
 
-                Object value = contactList.getContact(i).getFirstName();
-                row.add((value != null ? value.toString() : "&nbsp;"));
+             String sortPartQuery = this.sorter.GenerateSort();
+                if (sortPartQuery == null) {
+                    sortPartQuery = "";
+                }
+                    String [] filterPartQuery = this.filter.GenerateFilter();
+                if (filterPartQuery[0] != null) {
 
-                value = contactList.getContact(i).getLastName();
-                row.add((value != null ? value.toString() : "&nbsp;"));
+                    switch (Integer.parseInt(filterPartQuery[0])){
+                        case 0 : String value = contactList.getContact(i).getFirstName();
+                          if (value.startsWith(filterPartQuery[1]))
+                              this.copyValueContact(row,i);break;
+                          
+                        case 1 : value = contactList.getContact(i).getLastName();
+                          if (value.startsWith(filterPartQuery[1]))
+                            this.copyValueContact(row,i);break;
+                          
+                          
+                        case 2 : value = contactList.getContact(i).getBirthday();
+                          if (value.startsWith(filterPartQuery[1]))
+                              this.copyValueContact(row,i);break;
 
-                value = contactList.getContact(i).getBirthday();
-                row.add((value != null ? value.toString() : "&nbsp;"));
+                        case 3 :  value = contactList.getContact(i).getEmail();
+                          if (value.startsWith(filterPartQuery[1]))
+                              this.copyValueContact(row,i);break;
 
-                value = contactList.getContact(i).getEmail();
-                row.add((value != null ? value.toString() : "&nbsp;"));
-
-                value = contactList.getContact(i).isActif();
-                row.add((value != null ? value.toString() : "&nbsp;"));
-
-                for (int j = 0; this.columnExtras != null && j < this.columnExtras.length; j++) {
-                    String html = Util.replaceValuesHTML(this.columnExtras[j],i);
-                        row.add(html);
+                        default : value = String.valueOf(contactList.getContact(i).isActif());
+                          if (value.startsWith(filterPartQuery[1]))
+                            this.copyValueContact(row,i);break;
+                    }
+                    
                 }
 
-
-
-            this.data.add(row);
+                else {
+                    this.copyValueContact(row,i);
+                }
         }
     }
 
-     public void getRecordsAddress(HttpServletRequest request, int offset, int limit) throws Exception {
+    //Set the data into a JSONArray
+
+    public void getRecordsAddress(HttpServletRequest request, int offset, int limit) throws Exception {
 
          Contact contact = null;
 
         for (int i=0;i<contactList.size();i++)
              if(contactList.getContact(i).getID().equals(this.ID))
                 contact = contactList.getContact(i);
-
-
 
     this.rowCount = contact.getAllAdress().size();
 
@@ -276,161 +241,40 @@ public class Report {
             JSONArray row = new JSONArray();
             this.rowFilterCount++;
 
-                Object value = contact.getAdress(i).getNumber();
-                row.add((value != null ? value.toString() : "&nbsp;"));
-
-                value = contact.getAdress(i).getStreet();
-                row.add((value != null ? value.toString() : "&nbsp;"));
-
-                value = contact.getAdress(i).getPostalCode();
-                row.add((value != null ? value.toString() : "&nbsp;"));
-
-                value = contact.getAdress(i).getCity();
-                row.add((value != null ? value.toString() : "&nbsp;"));
-
-                for (int j = 0; this.columnExtras != null && j < this.columnExtras.length; j++) {
-                    String html = Util.replaceValuesHTMLAddress(this.columnExtras[j],contact,i);
-                        row.add(html);
-                }
-
-
-
-            this.data.add(row);
+            this.copyValueAddress(row, i, contact);
+                
         }
     }
 
-    /**
-     * Permite cargar los registros de la página siguiente
-     * @param conn  La conexión a la base de datos si se tiene una. Si la conexión es nula, se pide una del pool.
-     * Ver {@link PoolConnection}
-     * @throws Exception
-     */
-    public void getNextPage(Connection conn) throws Exception {
-        try {
-            if ((this.currentPage + 1) * this.ROWS_PER_PAGE > this.rowCount) {
-                return;
-            }
-            this.currentPage++;
-            getCurrentPage(conn);
-        } catch (Exception ex) {
-            throw ex;
-        }
-    }
-
-    /**
-     * Permite cargar los registros de la página actual
-     * @param conn  La conexión a la base de datos si se tiene una. Si la conexión es nula, se pide una del pool.
-     * Ver {@link PoolConnection}
-     * @throws Exception
-     */
-    private void getCurrentPage(Connection conn) throws Exception {
-        PreparedStatement statement = null;
-        ResultSet rs = null;
-        try {
-            //Futuro: Mejorar rendimiento trayendo bloques de paginas y no pagina por pagina
-            this.OFFSET = currentPage * this.ROWS_PER_PAGE;
-            if (rowCount > 0) {
-                if (conn == null) {
-                    if (conn == null) {
-                        throw new DBConnectionNotFound("Aucune connexion disponible");
-                    }
-                }
-
-                String sortPartQuery = this.sorter.GenerateSortSql();
-                if (sortPartQuery == null) {
-                    sortPartQuery = "";
-                }
-                String filterPartQuery = this.filter.GenerateFilterSql();
-                if (filterPartQuery == null) {
-                    filterPartQuery = "";
-                }
-                String queryPrepared = this.query + filterPartQuery + sortPartQuery + " LIMIT " + this.ROWS_PER_PAGE + " OFFSET " + this.OFFSET;
-
-                statement = conn.prepareStatement(queryPrepared);
-                rs = statement.executeQuery();
-                this.data = null;
-                this.data = new JSONArray();
-                this.rowFilterCount = 0;
-                while (rs.next()) {
-                    JSONArray row = new JSONArray();
-                    this.rowFilterCount++;
-                    for (int i = 1; i <= this.columnNames.length; i++)
-                        row.add(rs.getObject(i));
-
-                    this.data.add(row);
-                }
-            }
-        } catch (Exception ex) {
-            throw ex;
-        } finally {
-            if (rs != null) {
-                rs.close();
-            }
-            if (statement != null) {
-                statement.close();
-            }
-            if (conn != null) {
-                conn.close();
-            }
-        }
-
-    }
-
-    /**
-     * Permite limpiar la información de ordenamiento. Se usa esta limpieza por cada request asíncrono
-     * del objeto javascript que atiende el ordenamiento
-     */
     public void clearSort() {
         this.sorter.clearSort();
     }
 
-    /**
-     * Añade una columna en el ordenamiento con su dirección (asc ó desc). Esta información es enviada por el objeto javascript
-     * en cada request asíncrono
-     * @param sColNumber
-     * @param sColDir
-     */
     public void addSort(String sColNumber, String sColDir) {
         this.sorter.addSort(sColNumber, sColDir);
     }
 
-    /**
-     * Permite limpiar la información de filtrado. Se usa por cada request asíncrono
-     */
     public void clearFilter() {
         this.filter.clearFilter();
     }
 
-    /**
-     * Añade un nuevo filtro dado la columna y su valor
-     * @param sColNumber    Índice de la columna a ser filtrada
-     * @param sColValue     Valor de filtro de la columna
-     */
     public void addFilter(String sColNumber, String sColValue) {
         this.filter.addFilter(sColNumber, sColValue);
     }
 
-    /**
-     * Configura la búsqueda genérica de todas las columnas
-     * @param search    Valor a buscar
-     */
     public void setSearch(String search) {
         this.filter.setSearch(search);
     }
 
-    /**
-     * Permite configurar los parámetros del requerimiento (request) asíncrono. Esta función
-     * carga los registros de acuerdo a lo requerido y los deja en el arreglo JSON de datos.
-     * El controlador se encarga de enviar este objeto a la vista de paginación para poder
-     * generar el objeto javascript necesario para atender la petición.
-     * @param request   Request asíncrono recibido desde el objeto javascript
-     * @throws Exception
-     */
 
-    public void configureDatatableParametersDocuments(HttpServletRequest request) throws Exception {
+    /*
+     * Configure all the parameters for showing contact datas like the sorting column and the filter column
+     */
+    
+    public void configureDatatableParametersContact(HttpServletRequest request) throws Exception {
         try {
-            //Carga de datos provenientes del datatable
-            //Sorting
+            
+            //Sorting columns
             String sSortingCols = request.getParameter("iSortingCols");
             if (sSortingCols != null) {
                 this.clearSort();
@@ -445,9 +289,10 @@ public class Report {
             }
 
             this.clearFilter();
+
             for (int i = 0; i < this.columnNames.length; i++) {
                 String sColValue = request.getParameter("sSearch_" + i);
-                if (sColValue != null && !sColValue.trim().equals("")) {
+                 if (sColValue != null && !sColValue.trim().equals("")) {
                     this.addFilter("" + i, sColValue);
                 }
             }
@@ -465,15 +310,19 @@ public class Report {
             if (sOffset != null) {
                 offset = Integer.parseInt(sOffset);
             }
-            this.getRecordsDocuments(request, offset, limit);
+            this.getRecordsContact(request, offset, limit);
         } catch (Exception ex) {
             throw ex;
         }
     }
 
+    /*
+     * Configure all the parameters for showing address datas from a specific contact like the sorting column and the filter column
+     */
+
     public void configureDatatableParametersAddress(HttpServletRequest request) throws Exception {
         try {
-            //Carga de datos provenientes del datatable
+            
             //Sorting
             String sSortingCols = request.getParameter("iSortingCols");
             if (sSortingCols != null) {
@@ -516,13 +365,7 @@ public class Report {
     }
 
     /**
-     * Obtiene la definición javascript de las columnas del objeto para armar la salida
-     * @return  La definición en javascript de las columnas del objeto.<br/>
-     * Ejemplo:<br/>
-     * {<br/>
-     *      {sWidth: 10%, sClass:left, bVisible: true, bSortable: true},<br/>
-     *      {sWidth: 20%, sClass:right, bVisible: false, bSortable: false},<br/>
-     * }
+     * Obtain the javascript definitin f the column to configure the return
      */
     public String getJavascriptColumnDefinition() {
         String totalDef = null;
@@ -656,56 +499,26 @@ public class Report {
         return totalDef;
     }
 
-    /**
-     * Permite configurar las alineaciones de las columnas
-     * @param columnAligns  Arreglo de cadenas con las alineaciones: left, right o center
-     */
     public void setColumnAlignments(String[] columnAligns) {
         this.columnAligns = columnAligns;
     }
 
-    /**
-     * Permite configurar los anchos de las columnas
-     * @param columnWidths  Arreglo de cadenas con los anchos en porcentajes. <br/>
-     * Ejemplo:<br/>
-     *  report.setColumnWidths(new String[]{"10%", "5%", "20%"});
-     */
     public void setColumnWidths(String[] columnWidths) {
         this.columnWidths = columnWidths;
     }
 
-    /**
-     * Permite configurar las columnas extras. Estas columnas extras son html puro que el objeto escribe en la salida.
-     * @param columnExtras  Arreglo de cadenas de las columnas extras. Estas cadenas deben contener html.<br/>
-     * Si se necesitan referenciar a datos de alguna columna de la fila actual, se debe usar la notación
-     * <code>{<numeroDeColumna>}</code>
-     * Ejemplo:<br/>
-     * report.setColumnExtras(new String[]{"<form method=\"post\" action=\"procesa.html\"><input type=\"text\" name=\"campo1\" value=\"{0}\"/></form>"});
-     */
     public void setColumnExtras(String[] columnExtras) {
         this.columnExtras = columnExtras;
     }
 
-    /**
-     * Permite obtener las columnas extras para escribirlas en la salida
-     * @return  Arreglo de cadenas con las columnas extras en HTML
-     */
     public String[] getColumnExtras() {
         return new String[(this.columnExtras != null ? this.columnExtras.length : 0)];
     }
 
-    /**
-     * Configura la visibilidad de las columnas
-     * @param columnVisibles    Arreglo de lógicos que permite especificar si la columna es visible o invisible
-     */
     public void setColumnVisibles(Boolean[] columnVisibles) {
         this.columnVisibles = columnVisibles;
     }
 
-    /**
-     * Configura la ordenabilidad de las columnas
-     * @param columnSortables   Arreglo de lógicos que permite especificar si la columna permite ordenamiento o no
-     */
     public void setColumnSortables(Boolean[] columnSortables) {
         this.columnSortables = columnSortables;
     }
@@ -718,22 +531,14 @@ public class Report {
         this.ID = ID;
     }
 
-    
-
-    /**
-     * Configura la buscabilidad de las columnas
-     * @param columnSearchables Arreglo de lógicos que permite especificar si la columna permite filtros de búsqueda
-     */
     public void setColumnSearchables(Boolean[] columnSearchables) {
         this.columnSearchables = columnSearchables;
     }
 
-    /**
-     * Obtiene la definición de búsquedas por columna en el objeto. Es usada en la presentación del objeto
-     * @return  Arreglo de cadenas por columna que permite configurar la búsqueda o filtro por columnas
-     */
+    //Obtain the definition of the serch for the objet column. 
+
     public String[] getJavascriptSearchDefinition() {
-        //int len=(columnNames!=null?columnNames.length:0)+(columnExtras!=null?columnExtras.length:0);
+        
         if (this.columnSearchables == null) {
             return null;
         }
@@ -749,63 +554,12 @@ public class Report {
 
     }
 
-    /**
-     * Permite limpiar los filtros por columna. Usada por cada request asíncrono para empezar una nueva especificación
-     * de filtros.
-     */
-    public void clearWhere() {
-        this.where.clearWhere();
-    }
-
-    /**
-     * Añade una búsqueda o filtro por columna especificada al momento de request asíncrono
-     * mediante un valor determinado
-     * @param colName   Nombre de la columna
-     * @param colValue  Valor de filtro de la columna
-     */
-    public void addWhere(String colName, String colValue) {
-        this.where.addWhere(colName, colValue);
-    }
-
-    /**
-     * Añade una búsqueda o filtro por columna especificada al momento del request asíncrono
-     * mediante rango de valores. Usada para rangos de fechas o de valores
-     * @param colName   Nombre de la columna
-     * @param from      Valor inicial
-     * @param to        Valor final
-     */
-    public void addWhereBetween(String colName, String from, String to) {
-        this.where.addWhereBetween(colName, from, to);
-    }
-
-    /**
-     * Permite saber si la llamada es un requerimiento asincrono ajax de paginación, ordenamiento y/o búsqueda
-     * @param request   Request HTTP
-     * @return  Verdadero si la llamada es un requerimiento asíncrono de ajax
-     */
     public static boolean isAjaxCall(HttpServletRequest request) {
         return (request.getParameter("sEcho") != null );
     }
 
-    /**
-     * Permite saber si la llamada es un filtrado de valores de alguna forma anterior al reporte. Algunos reportes
-     * cuentan con una forma de filtrado antes de mostrar el reporte.
-     * @param request   Request HTTP
-     * @return  Verdadero si la llamada se hizo desde una pantalla de filtrado
-     */
-    public static boolean isFilterCall(HttpServletRequest request) {
-        return ("Consult".equals(request.getParameter("isFilterSubmit")) /*&& request.getSession().getAttribute("report")==null*/);
+    public static boolean isTaskCall(HttpServletRequest request) {
+        return ("Consult".equals(request.getParameter("isTaskSubmit")));
     }
-
-    public ReportWhere getWhere() {
-        return this.where;
-    }
-
-    public String getTask() {
-        return this.task;
-    }
-
-    public void setTask(String task) {
-        this.task = task;
-    }
+    
 }

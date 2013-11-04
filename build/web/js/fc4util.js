@@ -1,11 +1,3 @@
-
-var user_id = null;
-var emp_id = null;
-var rol_id = null;
-var comboUserID = null;
-var comboEmpID = null;
-var comboRolID = null;
-
 function sendRequest(URI, URLAsk,user,action)
     {
 
@@ -56,4 +48,27 @@ function sendRequest(URI, URLAsk,user,action)
         xmlhttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
         xmlhttp.send(send);
     }
+
+function dates() {
+
+var calendar = document.getElementById("calendar");
+
+        var date = calendar.value.split("/");
+        
+        var year = parseInt(date[0]);
+        var day = parseInt(date[1]);
+        var month = parseInt(date[2]);
+
+        if (isNaN(year) || isNan(day)|| isNan(month)){
+            alert("Ici");
+            document.getElementById('consult').disabled = true;
+            document.getElementById('message').innerHTML = "Format incorrect";
+        }
+        else {
+            
+         document.getElementById('consult').disabled = false;
+         document.getElementById('message').innerHTML = "";
+        }
+    }
+
      
