@@ -7,7 +7,7 @@
         <%@include file="htmlhead.jspf" %>
         <link rel="shortcut icon" type="image/ico" href="images/FileControl.ico">
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>Addresses</title>
+        <title>Address</title>
         <style type="text/css" title="currentStyle">
             @import "css/reset.css";
             @import "css/Help/helpStyle.css";

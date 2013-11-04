@@ -22,6 +22,7 @@ public class Report {
     private Boolean[] columnSortables;
     private Boolean[] columnSearchables;
     private String ID,URL;
+    private Contact contact = null;
     private JSONArray data;
     private int rowCount, rowFilterCount = 0;
     private int columnCount, currentPage, pageCount;
@@ -225,13 +226,13 @@ this.data.add(row);
 
     public void getRecordsAddress(HttpServletRequest request, int offset, int limit) throws Exception {
 
-         Contact contact = null;
+         
 
         for (int i=0;i<contactList.size();i++)
              if(contactList.getContact(i).getID().equals(this.ID))
-                contact = contactList.getContact(i);
+                this.contact = contactList.getContact(i);
 
-    this.rowCount = contact.getAllAdress().size();
+    this.rowCount = this.contact.getAllAdress().size();
 
     this.data = null;
     this.data = new JSONArray();
@@ -561,5 +562,14 @@ this.data.add(row);
     public static boolean isTaskCall(HttpServletRequest request) {
         return ("Consult".equals(request.getParameter("isTaskSubmit")));
     }
+
+    public Contact getContact() {
+        return contact;
+    }
+
+    public void setContact(Contact contact) {
+        this.contact = contact;
+    }
+
     
 }

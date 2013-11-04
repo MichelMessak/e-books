@@ -29,6 +29,8 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
                 <prop key="deleteAddress.form">/deleteAddress.form</prop>
                 <prop key="modifyContact.form">/modifyContact.form</prop>
                 <prop key="modifyAddress.form">/modifyAddress.form</prop>
+                <prop key="reportPDF.form">/reportPDF.form</prop>
+                <prop key="reportExcel.form">/reportExcel.form</prop>
             </props>
         </property>
     </bean>
@@ -106,6 +108,8 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
     </bean>
 
 
+      <bean name="/reportPDF.form" class="fr.esiea.ebooks.report.generic.ReportPDFController"/>
+      <bean name="/reportExcel.form" class="fr.esiea.ebooks.report.generic.ReportExcelController"/>
       <bean name="/reportContact.task" class="fr.esiea.ebooks.report.contact.ReportContactController"/>
       <bean name="/reportAddress.task" class="fr.esiea.ebooks.report.address.ReportAddressController"/>
     

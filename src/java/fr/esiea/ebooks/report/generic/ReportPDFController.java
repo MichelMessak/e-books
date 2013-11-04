@@ -4,6 +4,7 @@ import com.itextpdf.text.Document;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 import fr.esiea.ebooks.data.Report;
+import fr.esiea.ebooks.model.Contact;
 import fr.esiea.ebooks.model.ContactsList;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -25,13 +26,19 @@ public class ReportPDFController implements Controller {
 
         HttpSession se = request.getSession(false);
         Report report = (Report) se.getAttribute("report");
+        String task = null;
+
+        if (report.getURL().contains("Contact"))
+            task = "Contact";
+        else
+            task = "Address";
         
         Document document = new Document();
 
 			PdfWriter.getInstance(document, response.getOutputStream());
 
                         response.setContentType("application/pdf");
-                        response.setHeader("Content-disposition", "inline; filename=report.pdf");
+                        response.setHeader("Content-disposition", "inline; filename"+task +"=.pdf");
 			document.open();
 
                         PdfPTable header = new PdfPTable(report.getColumnCount());
@@ -42,24 +49,27 @@ public class ReportPDFController implements Controller {
                     }
                         document.add(header);
 
-                      try{
-                          
-                       /* for (int i = 0;i<contactList.get){
+                        if (task.equals("Contact")){
 
-                            for (int i = 1;i<=report.getColumnCount();i++){
-                                if (rs.getObject(i) == null)
-                                    table.addCell("");
-                                else
-                                    table.addCell(rs.getObject(i).toString());
+                            for (int i = 0;i<contactList.size();i++){
+                                table.addCell(contactList.getContact(i).getFirstName());
+                                table.addCell(contactList.getContact(i).getLastName());
+                                table.addCell(contactList.getContact(i).getBirthday());
+                                table.addCell(contactList.getContact(i).getEmail());
+                                table.addCell(String.valueOf(contactList.getContact(i).isActif()));
                             }
-                        }*/
+                       }
 
-                      }
-                              catch (Exception ex)
-                                {
-                                    throw ex;
-                                }
-                                
+                       else {
+                            Contact contact = report.getContact();
+                            for (int i = 0;i<contact.getAllAdress().size();i++){
+                                table.addCell(contact.getAdress(i).getNumber());
+                                table.addCell(contact.getAdress(i).getStreet());
+                                table.addCell(contact.getAdress(i).getPostalCode());
+                                table.addCell(contact.getAdress(i).getCity());
+                            }
+
+                       }
                       
                      table.setComplete(true);
                      document.add(table);

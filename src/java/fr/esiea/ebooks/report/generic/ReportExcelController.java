@@ -1,11 +1,10 @@
 package fr.esiea.ebooks.report.generic;
 
 import fr.esiea.ebooks.data.Report;
+import fr.esiea.ebooks.model.Contact;
+import fr.esiea.ebooks.model.ContactsList;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -22,6 +21,8 @@ import org.springframework.web.servlet.mvc.Controller;
  */
 public class ReportExcelController implements Controller {
 
+        ContactsList contactList = ContactsList.getInstance();
+
     public ModelAndView handleRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
         try {
@@ -29,7 +30,14 @@ public class ReportExcelController implements Controller {
         Report report = (Report) se.getAttribute("report");
             response.setContentType("application/vnd.ms-excel");
 
-            response.setHeader("Content-disposition", "inline; filename=report.xls");
+        String task = null;
+
+        if (report.getURL().contains("Contact"))
+            task = "Contact";
+        else
+            task = "Address";
+
+            response.setHeader("Content-disposition", "inline; filename="+task+".xls");
             HSSFWorkbook wb = new HSSFWorkbook();
 
             HSSFSheet sheet = wb.createSheet();
@@ -44,16 +52,57 @@ public class ReportExcelController implements Controller {
                 cell = row.createCell(cellnum++);
                 cell.setCellValue(report.getColumnNames()[i]);
             }
+
+            if (task.equals("Contact")){
+
+                            for (int i = 0;i<contactList.size();i++){
+
+                                row = sheet.createRow(rownum++);
+                                cellnum = 0;
+
+                                cell = row.createCell(cellnum++);
+                                cell.setCellValue(contactList.getContact(i).getFirstName());
+
+                                cell = row.createCell(cellnum++);
+                                cell.setCellValue(contactList.getContact(i).getLastName());
+
+                                cell = row.createCell(cellnum++);
+                                cell.setCellValue(contactList.getContact(i).getBirthday());
+
+                                cell = row.createCell(cellnum++);
+                                cell.setCellValue(contactList.getContact(i).getEmail());
+
+                                cell = row.createCell(cellnum++);
+                                cell.setCellValue(contactList.getContact(i).isActif());
+                            }
+                       }
+
+                       else {
+                            Contact contact = report.getContact();
+                            for (int i = 0;i<contact.getAllAdress().size();i++){
+
+                                row = sheet.createRow(rownum++);
+                                cellnum = 0;
+
+                                cell = row.createCell(cellnum++);
+                                cell.setCellValue(contact.getAdress(i).getNumber());
+
+                                cell = row.createCell(cellnum++);
+                                cell.setCellValue(contact.getAdress(i).getStreet());
+
+                                cell = row.createCell(cellnum++);
+                                cell.setCellValue(contact.getAdress(i).getPostalCode());
+                                
+                                cell = row.createCell(cellnum++);
+                                cell.setCellValue(contact.getAdress(i).getCity());
+
+                            }
+
+                       }
+                      
+
 /*
-                try {
-                    conn = PoolConnection.getPoolConnection();
-                    if (conn == null) {
-                        throw new DBConnectionNotFound("Aucune connexion disponible");
-                    }
-
-                    rs = statement.executeQuery();
-
-                    while (rs.next()) {
+                                    while (rs.next()) {
                         row = sheet.createRow(rownum++);
                         cellnum = 0;
                         for (int i = 1; i <= report.getColumnCount(); i++) {
@@ -66,19 +115,7 @@ public class ReportExcelController implements Controller {
                             }
                         }
                     }
-                } catch (Exception ex) {
-                    throw ex;
-                } finally {
-                    if (rs != null) {
-                        rs.close();
-                    }
-                    if (statement != null) {
-                        statement.close();
-                    }
-                    if (conn != null) {
-                        conn.close();
-                    }
-                }
+               
             */
             wb.write(response.getOutputStream());
             response.getOutputStream().flush();
