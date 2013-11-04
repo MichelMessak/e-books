@@ -37,7 +37,9 @@ public class ReportExcelController implements Controller {
         else
             task = "Address";
 
-            response.setHeader("Content-disposition", "inline; filename="+task+".xls");
+
+                            Contact contact = report.getContact();
+            response.setHeader("Content-disposition", "inline; filename="+contact+"_"+task+".xls");
             HSSFWorkbook wb = new HSSFWorkbook();
 
             HSSFSheet sheet = wb.createSheet();
@@ -78,7 +80,6 @@ public class ReportExcelController implements Controller {
                        }
 
                        else {
-                            Contact contact = report.getContact();
                             for (int i = 0;i<contact.getAllAdress().size();i++){
 
                                 row = sheet.createRow(rownum++);
